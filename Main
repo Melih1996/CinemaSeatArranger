@@ -1,0 +1,81 @@
+package cinema
+
+fun main() {
+    println("Enter the number of rows:")
+    val rows = readln().toInt()
+    println("Enter the number of seats in each row:")
+    val seatsPerRow = readln().toInt()
+
+
+    val bookedSeats = mutableSetOf<Pair<Int, Int>>()
+    var purchasedTickets = 0
+    var currentIncome = 0
+
+    while (true) {
+        println("\n1. Show the seats")
+        println("2. Buy a ticket")
+        println("3. Statistics")
+        println("0. Exit")
+
+        when (readln().toInt()) {
+            1 -> printCinema(rows, seatsPerRow, bookedSeats)
+            2 -> {
+                while (true) {
+                    println("Enter a row number:")
+                    val rowNum = readln().toInt()
+                    println("Enter a seat number in that row:")
+                    val seatNum = readln().toInt()
+
+                    if (rowNum !in 1..rows || seatNum !in 1..seatsPerRow) {
+                        println("Wrong input!")
+                    } else if (bookedSeats.contains(Pair(rowNum, seatNum))) {
+                        println("That ticket has already been purchased!")
+                    } else {
+
+                        val totalSeats = rows * seatsPerRow
+                        val frontHalf = rows / 2
+                        val ticketPrice = if (totalSeats <= 60 || rowNum <= frontHalf) 10 else 8
+
+                        println("\nTicket price: $$ticketPrice")
+                        bookedSeats.add(Pair(rowNum, seatNum)) // Mark seat as booked
+                        purchasedTickets++
+                        currentIncome += ticketPrice
+                        break
+                    }
+                }
+            }
+            3 -> printStatistics(rows, seatsPerRow, purchasedTickets, currentIncome)
+            0 -> {
+                println("Exiting the program.")
+                break
+            }
+            else -> println("Invalid input!")
+        }
+    }
+}
+
+fun printCinema(rows: Int, seatsPerRow: Int, bookedSeats: Set<Pair<Int, Int>>) {
+    println("Cinema:")
+    print("  ")
+    for (seatNum in 1..seatsPerRow) print("$seatNum ")
+    println()
+
+    for (rowNum in 1..rows) {
+        print("$rowNum ")
+        for (seatNum in 1..seatsPerRow) {
+            print(if (bookedSeats.contains(Pair(rowNum, seatNum))) "B " else "S ") // S: available, B: booked
+        }
+        println()
+    }
+}
+
+fun printStatistics(rows: Int, seatsPerRow: Int, purchasedTickets: Int, currentIncome: Int) {
+    val totalSeats = rows * seatsPerRow
+    val percentage = if (totalSeats > 0) (purchasedTickets.toDouble() / totalSeats) * 100 else 0.0
+    val totalIncome = if (totalSeats <= 60) totalSeats * 10 else (rows / 2 * seatsPerRow * 10) + ((rows - rows / 2) * seatsPerRow * 8)
+
+    println("Number of purchased tickets: $purchasedTickets")
+    println("Percentage: %.2f%%".format(percentage))
+    println("Current income: $$currentIncome")
+    println("Total income: $$totalIncome")
+}
